@@ -1,3 +1,4 @@
+import { at } from "json-server/lib/server/body-parser";
 import { useReducer } from "react";
 import { useState } from "react";
 import Modalcontent from "./Modalcontent";
@@ -6,11 +7,11 @@ const reduce = (state, action) => {
       if(action.type === "ADD_ITEM"){
         const newconst = [...state.people, action.payload]
         return {
-          people: newconst,
           ...state,
+          people: newconst,
           isModalOpen: true,
-          Modalcontent: "Item added"
-        }
+          Modalcontent: "Item added",
+        };
 
       }
       if(action.type === "NO_ITEM"){
@@ -21,12 +22,19 @@ const reduce = (state, action) => {
         }
         
       }
+      if (action.type === "CLOSE_MODAL"){
+        return {
+          ...state,
+          isModalOpen: false,
+        }
+
+      }
       throw new Error("Invalid action")
 }
 const DefaultState = {
     people: [],
     isModalOpen: false,
-    Modalcontent: ""
+    Modalcontent: "",
 }
 const Index = () => {
     const [name, setname] = useState("")
@@ -40,12 +48,15 @@ const Index = () => {
         }
         else {
           dispatch({type: "NO_ITEM"})
+          
         }
-
+        const closeModal = () => {
+          dispatch({type: "CLOSE_MODAL"})
+        }
     }
   return (
     <>
-    {state.isModalOpen && <Modalcontent Modalcontent={state.Modalcontent}/>}
+    {state.isModalOpen && <Modalcontent closeModal={closeModal} Modalcontent={state.Modalcontent}/>}
     <form onSubmit={handlesubmit}>
         <div >
           <input type="text" value={name} onChange = {
@@ -54,6 +65,7 @@ const Index = () => {
           </input>
         </div>
         <button type="submit">ADD</button>
+    </form>
     {
       state.people.map((person) => {
         return(
@@ -64,12 +76,7 @@ const Index = () => {
         )
       })
     }
-    </form>
 </>
   )
-
-
-
-
 }
 export default Index;
